@@ -18,21 +18,24 @@ config = {
         'tools.staticdir.dir': 'assets',
     },
     '/favicon.ico': {
-    'tools.staticfile.on': True,
-    'tools.staticfile.filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), "favicon.ico")
+        'tools.staticfile.on': True,
+        'tools.staticfile.filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), "favicon.ico")
     }
 }
 
-def process(fnc, arg):
-    if fnc is None or arg is None:
-        return None
-    header = "Date: " + str(arg)
-    table_header = ["Code", "Name", "Open", "Close", "High", "Low", "Previous Close", "Change Percentage"]
-    output = fnc(arg)
-    return {"output": output, "header": header, "table_header": table_header}
 
-def render(template, fnc=None, arg=None):
-    return env.get_template(template).render(data=process(fnc, arg))
+def process(func, arg):
+    if func is None or arg is None:
+        return None
+    try:
+        return func(arg)
+    except Exception as e:
+        print(e)
+
+
+def render(template, func=None, arg=None):
+    return env.get_template(template).render(data=process(func, arg))
+
 
 class HomePage(object):
 
@@ -41,11 +44,11 @@ class HomePage(object):
     def index():
         return render("index.html")
 
-
     @staticmethod
     @cherrypy.expose
     def bhavcopy(date):
         return render("results.html", download, date)
+
 
 root = HomePage()
 

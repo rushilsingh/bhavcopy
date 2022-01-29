@@ -9,4 +9,11 @@ table, th, td {
             th, td {
                 padding: 15px;
             }
-
+.center {
+	height:100%;
+	width: 50%;
+	margin-top: 25%;
+	margin-left : 25%;
+	text-align: center;
+	justify-content: center;
+}
