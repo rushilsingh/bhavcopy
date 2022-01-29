@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+<table>
+<tr><b>{{data.header}}</b></tr>
+{% if data.output is not string %}
+{% if data.output | length == 0 %}
+<tr> No results </tr>
+{% else %}
+<tr>
+{% for column in data.table_header %}
+<th>{{column}}</th>
+{% endfor %}
+</tr>
+{% for row in data.output %}
+     <tr>
+     {% for key in data.table_header %}
+        <td> {{row[key]}} </td>
+    {% endfor %}
+    </tr>
+{% endfor %}
+{% endif %}
+{% else %}
+<tr> {{data.output}} </tr>
+{% endif %}
+</table>
+<br />
+{% endblock %}
