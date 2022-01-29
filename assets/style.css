@@ -1,0 +1,19 @@
+html {
+  font-size: 18px;
+  color: #333;
+}
+table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 15px;
+            }
+.center {
+	height:100%;
+	width: 50%;
+	margin-top: 25%;
+	margin-left : 25%;
+	text-align: center;
+	justify-content: center;
+}
