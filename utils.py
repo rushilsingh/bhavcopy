@@ -20,6 +20,7 @@ def download(date):
     table_header = ["Code", "Name", "Open", "Close", "High",
                     "Low", "Previous Close", "Change"]
     output = bhavcopy_client.get_bhavcopy(date)
+    bse100 = bhavcopy_client.get_bse100()
     if output:
         print("From DB")
         return {"output": output, "header": header, "table_header": table_header}
@@ -43,7 +44,7 @@ def download(date):
             with open(fname) as f:
                 text = f.read()
             os.unlink(fname)
-            output = parse(text)
+            output = parse(text, bse100)
         else:
             output = {}
         if output:
@@ -53,7 +54,7 @@ def download(date):
         return {"output": output, "header": header, "table_header": table_header}
 
 
-def parse(text):
+def parse(text, bse100):
 
     lines = text.split("\n")
     header = lines[0]
@@ -78,6 +79,8 @@ def parse(text):
         low_value = fields[low_index]
         prevclose = fields[prevclose_index]
         sc_code = fields[code_index]
+        if sc_code not in bse100:
+            continue
         record = {"Name": name, "Open": open_value, "Close": close_value,
                   "High": high_value, "Low": low_value, "Previous Close": prevclose, "Code": sc_code}
         records.append(record)
