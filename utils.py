@@ -18,7 +18,7 @@ def download(date):
     date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d%m%y')
 
     table_header = ["Code", "Name", "Open", "Close", "High",
-                    "Low", "Previous Close", "Change Percentage"]
+                    "Low", "Previous Close", "Change"]
     output = bhavcopy_client.get_bhavcopy(date)
     if output:
         print("From DB")
@@ -48,6 +48,8 @@ def download(date):
             output = {}
         if output:
             bhavcopy_client.insert_bhavcopy(date, output)
+
+
         return {"output": output, "header": header, "table_header": table_header}
 
 
@@ -79,16 +81,26 @@ def parse(text):
         record = {"Name": name, "Open": open_value, "Close": close_value,
                   "High": high_value, "Low": low_value, "Previous Close": prevclose, "Code": sc_code}
         records.append(record)
-    diffs = []
     parsed = []
+    invalids = []
     for record in records:
         name = record["Name"]
         close_value = float(record["Close"])
         prevclose_value = float(record["Previous Close"])
         diff = close_value - prevclose_value
-        diff = (diff/close_value) * 100.00000
         name = "\"" + name + "\"" if " " in name else name
-        record["Change Percentage"] = "%.2f " % diff + " %"
-        diffs.append(diff)
-        parsed.append(record)
+        try:
+            diff = (diff/prevclose_value) * 100.00000
+            record["Change"] = diff
+        except Exception as e:
+            record["Change"] = "NA"
+            invalids.append(record)
+        else:
+            parsed.append(record)
+
+    parsed = sorted(parsed, key=lambda k: k.get("Change"), reverse=True)
+    for record in parsed:
+        record["Change"] = "%.2f %%" % record["Change"]
+    parsed.extend(invalids)
+
     return parsed

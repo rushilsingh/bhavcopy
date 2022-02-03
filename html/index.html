@@ -1,5 +1,62 @@
 {% extends "layout.html" %}
 {% block body %}
-	<form type="post" class="center" action="bhavcopy"> <input id="date" type="date" name="date"> <button id="search_submit" type="submit" >
-	Submit</button> </form>
+<form type="post" class="center" action="bhavcopy">
+  <h1> BSE Bhavcopy </h1>
+  <br />
+  <input id="date" type="date" name="date"> <button id="search_submit" type="submit">
+    Submit</button>
+  <br /><br /><br />
+  <table>
+    <tr>
+      <td bgcolor="#ffffff" class="tdcolumn">Code</td>
+      <td bgcolor="#ffffff" class="tdcolumn">Unique code assigned to a scrip
+        of a company by BSE.</td>
+
+    </tr>
+    <tr>
+
+      <td bgcolor="#ffffff" class="tdcolumn">Name</td>
+      <td bgcolor="#ffffff" class="tdcolumn">Name of the company.</td>
+
+    </tr>
+    <tr>
+
+      <td bgcolor="#ffffff" class="tdcolumn">Open</td>
+      <td bgcolor="#ffffff" class="tdcolumn">The price at which the security
+        first trades on a given trading day.</td>
+
+    </tr>
+    <tr>
+
+      <td bgcolor="#ffffff" class="tdcolumn">High</td>
+      <td bgcolor="#ffffff" class="tdcolumn">The highest intra-day price of a
+        stock.</td>
+
+    </tr>
+    <tr>
+
+      <td bgcolor="#ffffff" class="tdcolumn">Low</td>
+      <td bgcolor="#ffffff" class="tdcolumn">The lowest intra-day
+        price of a stock.</td>
+
+    </tr>
+    <tr>
+
+      <td bgcolor="#ffffff" class="tdcolumn">Close</td>
+      <td bgcolor="#ffffff" class="tdcolumn">The final price
+        at which a security is traded on a given trading day.</td>
+
+    </tr>
+    <tr>
+      <td bgcolor="#ffffff" class="tdcolumn">Previous Close</td>
+      <td bgcolor="#ffffff" class="tdcolumn">The closing price
+        of the stock for the previous trading day.</td>
+    </tr>
+    <tr>
+      <td bgcolor="#ffffff" class="tdcolumn">Change</td>
+      <td bgcolor="#ffffff" class="tdcolumn">Percentage change from closing prices for previous trading day to closing price of current trading day.</td>
+    </tr>
+
+  </table>
+</form>
 {% endblock %}
