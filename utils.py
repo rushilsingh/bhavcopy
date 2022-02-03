@@ -4,41 +4,51 @@ import requests
 import io
 import zipfile
 import datetime
-import textfsm
 import pytz
+from db_client import DBClient
 
+bhavcopy_client = DBClient(os.environ.get("MONGO_URL"))
 BASE_FNAME = "EQ{}.CSV"
 BASE_URL = "https://www.bseindia.com/download/BhavCopy/Equity/EQ{}_CSV.ZIP"
 
 
 def download(date):
+
     header = "Date: " + date
+    date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d%m%y')
+
     table_header = ["Code", "Name", "Open", "Close", "High",
                     "Low", "Previous Close", "Change Percentage"]
-    date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d%m%y')
-    url = BASE_URL.format(date)
-    headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) '
-               'Chrome/23.0.1271.64 Safari/537.11',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-               'Accept-Encoding': 'none',
-               'Accept-Language': 'en-US,en;q=0.8',
-               'Connection': 'keep-alive'}
-
-    response = requests.get(url, headers=headers)
-    fname = BASE_FNAME.format(date)
-
-    if response and response.status_code == 200:
-        z = zipfile.ZipFile(io.BytesIO(response.content))
-        z.extractall()
-        with open(fname) as f:
-            text = f.read()
-        os.unlink(fname)
-        output = parse(text)
+    output = bhavcopy_client.get_bhavcopy(date)
+    if output:
+        print("From DB")
+        return {"output": output, "header": header, "table_header": table_header}
     else:
-        output = {}
+        print("No entry in DB. Downloading fresh copy")
+        url = BASE_URL.format(date)
+        headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) '
+                   'Chrome/23.0.1271.64 Safari/537.11',
+                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                   'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                   'Accept-Encoding': 'none',
+                   'Accept-Language': 'en-US,en;q=0.8',
+                   'Connection': 'keep-alive'}
 
-    return {"output": output, "header": header, "table_header": table_header}
+        response = requests.get(url, headers=headers)
+        fname = BASE_FNAME.format(date)
+
+        if response and response.status_code == 200:
+            z = zipfile.ZipFile(io.BytesIO(response.content))
+            z.extractall()
+            with open(fname) as f:
+                text = f.read()
+            os.unlink(fname)
+            output = parse(text)
+        else:
+            output = {}
+        if output:
+            bhavcopy_client.insert_bhavcopy(date, output)
+        return {"output": output, "header": header, "table_header": table_header}
 
 
 def parse(text):
